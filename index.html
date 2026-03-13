@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QBCC Interview Prep — Dr. Mubashir Imran</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --border: #475569;
+    --code-bg: #0d1117;
+    --card: #1e293b;
+    --card-hover: #263348;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  body.locked { overflow:hidden; }
+
+  /* ===== LOGIN SCREEN ===== */
+  .login-overlay {
+    position:fixed; inset:0; z-index:9999;
+    background: var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .4s, visibility .4s;
+  }
+  .login-overlay.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+  .login-box {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:16px; padding:2.5rem; width:380px; max-width:90vw;
+    text-align:center; box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .login-box h1 {
+    font-size:1.4rem; font-weight:800; margin-bottom:.3rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .login-box p { color:var(--text2); font-size:.85rem; margin-bottom:1.5rem; }
+  .login-box .lock-icon { font-size:2.5rem; margin-bottom:1rem; }
+  .login-input-wrap {
+    position:relative; margin-bottom:1rem;
+  }
+  .login-input-wrap input {
+    width:100%; padding:.75rem 1rem; border-radius:10px;
+    border:1px solid var(--border); background:var(--bg);
+    color:var(--text); font-size:1rem; outline:none;
+    text-align:center; letter-spacing:.15em; font-weight:600;
+    transition: border-color .2s;
+  }
+  .login-input-wrap input:focus { border-color:var(--accent); }
+  .login-input-wrap input::placeholder { letter-spacing:normal; font-weight:400; color:var(--text2); }
+  .login-btn {
+    width:100%; padding:.75rem; border:none; border-radius:10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color:#fff; font-size:.95rem; font-weight:700; cursor:pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .login-btn:hover { opacity:.9; }
+  .login-btn:active { transform:scale(.98); }
+  .login-error {
+    color:var(--red); font-size:.8rem; margin-top:.8rem;
+    opacity:0; transition:opacity .3s;
+  }
+  .login-error.show { opacity:1; }
+  .login-box .shake {
+    animation: shake .4s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform:translateX(0); }
+    20% { transform:translateX(-10px); }
+    40% { transform:translateX(10px); }
+    60% { transform:translateX(-6px); }
+    80% { transform:translateX(6px); }
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    position: fixed; top:0; left:0; right:0; z-index:1000;
+    background: rgba(15,23,42,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .topbar-left { display:flex; align-items:center; gap:1rem; }
+  .topbar-left h1 { font-size:1.1rem; font-weight:700; color:var(--accent); }
+  .topbar-left .badge {
+    background: var(--accent2); color:#fff; font-size:.7rem;
+    padding: 2px 10px; border-radius: 12px; font-weight:600;
+  }
+  .hamburger {
+    display:none; background:none; border:none; color:var(--text);
+    font-size:1.5rem; cursor:pointer; padding:4px 8px;
+  }
+  .countdown {
+    display:flex; align-items:center; gap:.6rem;
+    background: var(--bg2); border:1px solid var(--border);
+    padding: .4rem 1rem; border-radius: 8px; font-size:.85rem;
+  }
+  .countdown .cd-label { color:var(--text2); }
+  .countdown .cd-value { color:var(--yellow); font-weight:700; font-variant-numeric:tabular-nums; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    position:fixed; top:60px; left:0; bottom:0; width:280px;
+    background: var(--bg2); border-right:1px solid var(--border);
+    overflow-y:auto; z-index:900; transition: transform .3s;
+    padding: 1rem 0;
+  }
+  .sidebar.closed { transform: translateX(-100%); }
+  .sidebar-section { padding: .5rem 1rem; }
+  .sidebar-section h3 {
+    font-size:.65rem; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--text2); margin-bottom:.5rem; font-weight:600;
+  }
+  .nav-item {
+    display:flex; align-items:center; gap:.6rem;
+    padding: .55rem .8rem; border-radius:8px; cursor:pointer;
+    font-size:.85rem; color:var(--text2); transition: all .15s;
+    text-decoration:none; margin-bottom:2px;
+  }
+  .nav-item:hover { background:var(--bg3); color:var(--text); }
+  .nav-item.active { background:rgba(56,189,248,0.12); color:var(--accent); font-weight:600; }
+  .nav-icon { font-size:1rem; width:22px; text-align:center; }
+  .nav-item .check { margin-left:auto; color:var(--green); font-size:.8rem; opacity:0; transition:opacity .2s; }
+  .nav-item .check.done { opacity:1; }
+
+  /* ===== SEARCH ===== */
+  .search-box {
+    padding: .5rem 1rem; margin-bottom:.5rem;
+  }
+  .search-box input {
+    width:100%; background:var(--bg); border:1px solid var(--border);
+    color:var(--text); padding:.5rem .8rem; border-radius:8px;
+    font-size:.85rem; outline:none; transition: border .2s;
+  }
+  .search-box input:focus { border-color:var(--accent); }
+  .search-box input::placeholder { color:var(--text2); }
+
+  /* ===== PROGRESS ===== */
+  .progress-bar {
+    margin: 0 1rem 1rem; background:var(--bg); border-radius:4px; height:6px; overflow:hidden;
+  }
+  .progress-fill {
+    height:100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius:4px; transition: width .4s ease;
+  }
+  .progress-label { font-size:.7rem; color:var(--text2); padding:0 1rem; margin-bottom:.3rem; }
+
+  /* ===== MAIN ===== */
+  .main {
+    margin-left:280px; margin-top:60px; padding:2rem;
+    max-width:960px;
+    transition: margin .3s;
+  }
+  .main.full { margin-left:0; }
+
+  /* ===== SECTIONS ===== */
+  .section { display:none; animation: fadeIn .3s ease; }
+  .section.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .section-title {
+    font-size:1.8rem; font-weight:800; margin-bottom:.3rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .section-subtitle { color:var(--text2); font-size:.95rem; margin-bottom:2rem; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:1.5rem; margin-bottom:1.2rem;
+    transition: all .2s;
+  }
+  .card:hover { border-color:var(--accent); background:var(--card-hover); }
+  .card h3 { font-size:1.05rem; margin-bottom:.5rem; color:var(--text); }
+  .card p, .card li { font-size:.9rem; color:var(--text2); }
+  .card ul { padding-left:1.2rem; }
+  .card li { margin-bottom:.3rem; }
+
+  /* ===== COLLAPSIBLE ===== */
+  .collapsible {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; margin-bottom:.8rem; overflow:hidden;
+    transition: border-color .2s;
+  }
+  .collapsible:hover { border-color: var(--accent); }
+  .collapsible-header {
+    padding:1rem 1.2rem; cursor:pointer; display:flex;
+    align-items:center; justify-content:space-between;
+    user-select:none;
+  }
+  .collapsible-header h3 { font-size:.95rem; font-weight:600; display:flex; align-items:center; gap:.6rem; }
+  .collapsible-header .attr-num {
+    background:var(--accent); color:var(--bg); font-size:.7rem;
+    width:22px; height:22px; border-radius:50%; display:flex;
+    align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
+  }
+  .collapsible-arrow {
+    transition:transform .3s; font-size:.8rem; color:var(--text2);
+  }
+  .collapsible.open .collapsible-arrow { transform:rotate(180deg); }
+  .collapsible-body {
+    max-height:0; overflow:hidden; transition: max-height .4s ease;
+    padding: 0 1.2rem;
+  }
+  .collapsible.open .collapsible-body {
+    max-height: 5000px; padding: 0 1.2rem 1.2rem;
+  }
+
+  /* ===== STAR FORMAT ===== */
+  .star-label {
+    display:inline-block; font-size:.7rem; font-weight:700;
+    padding: 2px 8px; border-radius:4px; margin-bottom:.4rem;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .star-s { background:rgba(56,189,248,0.15); color:var(--accent); }
+  .star-t { background:rgba(129,140,248,0.15); color:var(--accent2); }
+  .star-a { background:rgba(74,222,128,0.15); color:var(--green); }
+  .star-r { background:rgba(251,191,36,0.15); color:var(--yellow); }
+  .star-q { background:rgba(248,113,113,0.15); color:var(--red); }
+
+  .star-block { margin-bottom:1rem; }
+  .star-block p { font-size:.88rem; color:var(--text2); margin-top:.3rem; }
+  .star-block ul { padding-left:1.2rem; margin-top:.3rem; }
+  .star-block li { font-size:.88rem; color:var(--text2); margin-bottom:.2rem; }
+
+  /* ===== CODE ===== */
+  .code-block {
+    background:var(--code-bg); border:1px solid var(--border);
+    border-radius:8px; padding:1rem 1.2rem; overflow-x:auto;
+    font-family:'JetBrains Mono','Fira Code','Cascadia Code',monospace;
+    font-size:.8rem; line-height:1.6; margin: .8rem 0;
+    position:relative; white-space:pre;
+  }
+  .code-block .lang-tag {
+    position:absolute; top:6px; right:10px; font-size:.65rem;
+    color:var(--text2); background:var(--bg2); padding:1px 8px;
+    border-radius:4px; font-family:system-ui;
+  }
+  .kw { color:#ff7b72; }
+  .fn { color:#d2a8ff; }
+  .str { color:#a5d6ff; }
+  .cm { color:#8b949e; font-style:italic; }
+  .num { color:#79c0ff; }
+  .op { color:#ff7b72; }
+
+  /* ===== TABLE ===== */
+  .styled-table {
+    width:100%; border-collapse:collapse; font-size:.85rem; margin:.8rem 0;
+  }
+  .styled-table th {
+    background:var(--bg3); padding:.7rem .8rem; text-align:left;
+    font-size:.75rem; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--accent); border-bottom:2px solid var(--accent);
+  }
+  .styled-table td {
+    padding:.6rem .8rem; border-bottom:1px solid var(--border); color:var(--text2);
+  }
+  .styled-table tr:hover td { background:var(--bg3); }
+
+  /* ===== QUOTE ===== */
+  .quote {
+    border-left:3px solid var(--accent); padding:.8rem 1.2rem;
+    background:rgba(56,189,248,0.05); border-radius:0 8px 8px 0;
+    margin:.8rem 0; font-size:.9rem; font-style:italic; color:var(--text);
+  }
+
+  /* ===== TAGS ===== */
+  .tag {
+    display:inline-block; font-size:.7rem; padding:2px 10px;
+    border-radius:12px; margin:2px; font-weight:500;
+  }
+  .tag-blue { background:rgba(56,189,248,0.15); color:var(--accent); }
+  .tag-purple { background:rgba(129,140,248,0.15); color:var(--accent2); }
+  .tag-green { background:rgba(74,222,128,0.15); color:var(--green); }
+  .tag-yellow { background:rgba(251,191,36,0.15); color:var(--yellow); }
+  .tag-red { background:rgba(248,113,113,0.15); color:var(--red); }
+  .tag-orange { background:rgba(251,146,60,0.15); color:var(--orange); }
+
+  /* ===== ALERT ===== */
+  .alert {
+    padding:1rem 1.2rem; border-radius:10px; margin:.8rem 0;
+    font-size:.88rem; display:flex; align-items:flex-start; gap:.6rem;
+  }
+  .alert-warn { background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); color:var(--yellow); }
+  .alert-info { background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); color:var(--accent); }
+  .alert-danger { background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.25); color:var(--red); }
+  .alert-icon { font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+
+  /* ===== DIAGRAM ===== */
+  .diagram {
+    background:var(--code-bg); border:1px solid var(--border);
+    border-radius:8px; padding:1.2rem; overflow-x:auto;
+    font-family:monospace; font-size:.78rem; line-height:1.5;
+    color:var(--text2); white-space:pre; margin:.8rem 0;
+  }
+
+  /* ===== QA FLASHCARD ===== */
+  .flashcard {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; margin-bottom:.6rem; overflow:hidden; cursor:pointer;
+    transition:all .2s;
+  }
+  .flashcard:hover { border-color:var(--accent2); }
+  .flashcard-q {
+    padding:.8rem 1.2rem; font-size:.88rem; font-weight:600;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .flashcard-q::before { content:"Q"; background:var(--accent2); color:#fff; font-size:.65rem; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .flashcard-a {
+    max-height:0; overflow:hidden; transition:max-height .3s;
+    padding:0 1.2rem; font-size:.85rem; color:var(--text2);
+  }
+  .flashcard.open .flashcard-a { max-height:500px; padding:0 1.2rem 1rem; }
+
+  /* ===== EMBELLISHED TABLE ===== */
+  .risk-low { color:var(--green); }
+  .risk-med { color:var(--yellow); }
+  .risk-high { color:var(--orange); }
+
+  /* ===== ORG CHART ===== */
+  .org-chart {
+    display:flex; flex-direction:column; align-items:center; gap:0; margin:1.5rem 0;
+  }
+  .org-node {
+    background:var(--bg3); border:1px solid var(--border);
+    padding:.5rem 1.2rem; border-radius:8px; font-size:.82rem;
+    text-align:center; position:relative;
+  }
+  .org-node.you { border-color:var(--accent); background:rgba(56,189,248,0.1); color:var(--accent); font-weight:700; }
+  .org-line { width:2px; height:20px; background:var(--border); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .sidebar { transform:translateX(-100%); }
+    .sidebar.open { transform:translateX(0); }
+    .main { margin-left:0 !important; }
+    .hamburger { display:block; }
+    .topbar-left h1 { font-size:.95rem; }
+    .countdown { font-size:.75rem; padding:.3rem .6rem; }
+  }
+  @media (max-width: 600px) {
+    .main { padding:1rem; }
+    .section-title { font-size:1.4rem; }
+    .styled-table { font-size:.75rem; }
+    .card { padding:1rem; }
+  }
+
+  /* ===== OVERLAY ===== */
+  .overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:850;
+  }
+  .overlay.show { display:block; }
+
+  /* ===== SCROLL ===== */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--border); }
+
+  /* ===== PRINT ===== */
+  @media print {
+    .topbar, .sidebar, .overlay, .hamburger { display:none!important; }
+    .main { margin:0!important; }
+    .section { display:block!important; page-break-inside:avoid; }
+    .collapsible-body { max-height:none!important; padding:0 1.2rem 1rem!important; }
+    body { background:#fff; color:#222; }
+    .card, .collapsible { border:1px solid #ccc; }
+  }
+</style>
+</head>
+<body class="locked">
+
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box" id="loginBox">
+    <div class="lock-icon">&#x1f512;</div>
+    <h1>Interview Prep</h1>
+    <p>QBCC AO7 Senior Data Scientist</p>
+    <form onsubmit="return handleLogin(event)">
+      <div class="login-input-wrap">
+        <input type="password" id="loginPassword" placeholder="Enter password" autofocus autocomplete="off">
+      </div>
+      <button type="submit" class="login-btn">Unlock</button>
+    </form>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
+    <h1>QBCC Interview Prep</h1>
+    <span class="badge">AO7 Senior Data Scientist</span>
+  </div>
+  <div class="countdown">
+    <span class="cd-label">Interview in</span>
+    <span class="cd-value" id="countdown">--</span>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search all content..." oninput="handleSearch(this.value)">
+  </div>
+  <div class="progress-label">Study Progress: <span id="progress-pct">0%</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="sidebar-section">
+    <h3>Overview</h3>
+    <a class="nav-item active" data-section="dashboard" onclick="showSection('dashboard')">
+      <span class="nav-icon">&#x1f3af;</span> Dashboard
+      <span class="check" id="check-dashboard">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="intro" onclick="showSection('intro')">
+      <span class="nav-icon">&#x1f44b;</span> Your Introduction
+      <span class="check" id="check-intro">&#10003;</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Research</h3>
+    <a class="nav-item" data-section="qbcc" onclick="showSection('qbcc')">
+      <span class="nav-icon">&#x1f3d7;</span> About QBCC
+      <span class="check" id="check-qbcc">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="usecases" onclick="showSection('usecases')">
+      <span class="nav-icon">&#x1f9e0;</span> AI/ML Use Cases
+      <span class="check" id="check-usecases">&#10003;</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>STAR Stories</h3>
+    <a class="nav-item" data-section="star1" onclick="showSection('star1')">
+      <span class="nav-icon">1</span> Python/SQL at Scale
+      <span class="check" id="check-star1">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star2" onclick="showSection('star2')">
+      <span class="nav-icon">2</span> Cloud Platforms
+      <span class="check" id="check-star2">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star3" onclick="showSection('star3')">
+      <span class="nav-icon">3</span> ML Lifecycle
+      <span class="check" id="check-star3">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star4" onclick="showSection('star4')">
+      <span class="nav-icon">4</span> GenAI &amp; Agents
+      <span class="check" id="check-star4">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star5" onclick="showSection('star5')">
+      <span class="nav-icon">5</span> Business &rarr; Tech
+      <span class="check" id="check-star5">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star6" onclick="showSection('star6')">
+      <span class="nav-icon">6</span> MLOps &amp; CI/CD
+      <span class="check" id="check-star6">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star7" onclick="showSection('star7')">
+      <span class="nav-icon">7</span> Responsible AI
+      <span class="check" id="check-star7">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="star8" onclick="showSection('star8')">
+      <span class="nav-icon">8</span> Stakeholders
+      <span class="check" id="check-star8">&#10003;</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Technical</h3>
+    <a class="nav-item" data-section="technical" onclick="showSection('technical')">
+      <span class="nav-icon">&#x1f4bb;</span> Technical Assessment
+      <span class="check" id="check-technical">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="quickfire" onclick="showSection('quickfire')">
+      <span class="nav-icon">&#x26a1;</span> Quick-Fire Q&amp;A
+      <span class="check" id="check-quickfire">&#10003;</span>
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <h3>Bonus</h3>
+    <a class="nav-item" data-section="bonus" onclick="showSection('bonus')">
+      <span class="nav-icon">&#x2b50;</span> Bonus Questions
+      <span class="check" id="check-bonus">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="questions" onclick="showSection('questions')">
+      <span class="nav-icon">&#x2753;</span> Ask the Panel
+      <span class="check" id="check-questions">&#10003;</span>
+    </a>
+    <a class="nav-item" data-section="embellished" onclick="showSection('embellished')">
+      <span class="nav-icon">&#x26a0;</span> Reality Check
+      <span class="check" id="check-embellished">&#10003;</span>
+    </a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main" id="main">
+
+  <!-- ==================== DASHBOARD ==================== -->
+  <div class="section active" id="sec-dashboard">
+    <h2 class="section-title">Interview Dashboard</h2>
+    <p class="section-subtitle">QBCC AO7 Senior Data Scientist &mdash; Tuesday 17 March 2026, 11:00 AM via Teams</p>
+
+    <div class="card">
+      <h3>&#x1f4c5; Interview Details</h3>
+      <table class="styled-table">
+        <tr><td style="width:140px;font-weight:600;color:var(--text)">Date</td><td>Tuesday 17 March 2026</td></tr>
+        <tr><td style="font-weight:600;color:var(--text)">Time</td><td>11:00 AM AEST</td></tr>
+        <tr><td style="font-weight:600;color:var(--text)">Format</td><td>~45 min — Technical Assessment + Interview Questions</td></tr>
+        <tr><td style="font-weight:600;color:var(--text)">Platform</td><td>Microsoft Teams</td></tr>
+        <tr><td style="font-weight:600;color:var(--text)">Meeting ID</td><td>494 705 729 342 45 &nbsp;|&nbsp; Passcode: nw3A2223</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f465; Panel Members</h3>
+      <table class="styled-table">
+        <tr><th>Name</th><th>Role</th><th>Focus</th></tr>
+        <tr><td style="color:var(--text);font-weight:600">Zohaib Jan (Chair)</td><td>Manager, Data Science &amp; Engineering</td><td>Technical depth, team fit, data science capability</td></tr>
+        <tr><td style="color:var(--text);font-weight:600">Adela Padurean</td><td>Manager, Services Trades</td><td>Business translation, stakeholder communication, regulatory understanding</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f4ca; Your CV &rarr; Role Match</h3>
+      <table class="styled-table">
+        <tr><th>PD Requirement</th><th>Your Evidence</th></tr>
+        <tr><td>Scalable data solutions (Python/SQL)</td><td>Amazon: 100K+ events/day; PhD: 100GB+ datasets</td></tr>
+        <tr><td>Cloud data platforms &amp; warehousing</td><td>AWS (Lambda, S3, DynamoDB, Glue, Kinesis); Microsoft Fabric</td></tr>
+        <tr><td>ML lifecycle management</td><td>PhD (PyTorch, TensorFlow); federated learning; Amazon deployment</td></tr>
+        <tr><td>Gen AI, Agentic Systems, AI Agents</td><td>Lexertia (multi-LLM, RAG); Medical Transcription (LangChain/FAISS)</td></tr>
+        <tr><td>Business requirements &rarr; tech solutions</td><td>Amazon out-of-stock; Fluvio IoT; Healthcare automation</td></tr>
+        <tr><td>MLOps &amp; CI/CD</td><td>Lexertia (Nginx, systemd, CI/CD); Amazon internal pipelines</td></tr>
+        <tr><td>Responsible AI &amp; data ethics</td><td>PhD: privacy-preserving federated learning; legal/healthcare governance</td></tr>
+        <tr><td>Stakeholder engagement</td><td>Cross-domain: legal, healthcare, IoT, academia (ICDE/DASFAA)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f3af; Key Themes to Weave Into Every Answer</h3>
+      <ol style="padding-left:1.2rem;">
+        <li style="margin-bottom:.5rem;"><strong style="color:var(--accent)">Regulatory impact</strong> — Your work enables better, fairer regulation (not just cool tech).</li>
+        <li style="margin-bottom:.5rem;"><strong style="color:var(--accent)">Scale</strong> — You've handled 100GB+ in PhD, 100K events/day at Amazon. QBCC needs this.</li>
+        <li style="margin-bottom:.5rem;"><strong style="color:var(--accent)">End-to-end ownership</strong> — Data pipelines &rarr; ML models &rarr; production deployment &rarr; monitoring.</li>
+        <li style="margin-bottom:.5rem;"><strong style="color:var(--accent)">Responsible AI</strong> — Your PhD was literally about privacy-preserving ML. Government cares.</li>
+        <li style="margin-bottom:.5rem;"><strong style="color:var(--accent)">Stakeholder communication</strong> — Translated complex AI to lawyers, clinicians, engineers, academics.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f4c8; Expected Interview Flow</h3>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;">
+        <div style="flex:1;min-width:150px;background:var(--bg);border-radius:8px;padding:.8rem;text-align:center;">
+          <div style="font-size:.65rem;color:var(--text2);text-transform:uppercase;">~3 min</div>
+          <div style="font-weight:700;color:var(--accent);font-size:.9rem;">Introduction</div>
+        </div>
+        <div style="flex:2;min-width:150px;background:var(--bg);border-radius:8px;padding:.8rem;text-align:center;">
+          <div style="font-size:.65rem;color:var(--text2);text-transform:uppercase;">~15-20 min</div>
+          <div style="font-weight:700;color:var(--accent2);font-size:.9rem;">Technical Assessment</div>
+        </div>
+        <div style="flex:2;min-width:150px;background:var(--bg);border-radius:8px;padding:.8rem;text-align:center;">
+          <div style="font-size:.65rem;color:var(--text2);text-transform:uppercase;">~20 min</div>
+          <div style="font-weight:700;color:var(--green);font-size:.9rem;">Behavioural Questions</div>
+        </div>
+        <div style="flex:1;min-width:150px;background:var(--bg);border-radius:8px;padding:.8rem;text-align:center;">
+          <div style="font-size:.65rem;color:var(--text2);text-transform:uppercase;">~5 min</div>
+          <div style="font-weight:700;color:var(--yellow);font-size:.9rem;">Your Questions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== INTRODUCTION ==================== -->
+  <div class="section" id="sec-intro">
+    <h2 class="section-title">Your 2-Minute Introduction</h2>
+    <p class="section-subtitle">Practise this until it flows naturally. Time yourself &mdash; keep under 2 minutes.</p>
+
+    <div class="quote">
+      "I'm Mubashir Imran &mdash; I have a PhD in Data Science from UQ where I focused on federated learning and large-scale network embeddings, publishing at A* venues like ICDE and TKDE. Professionally, I've spent 7+ years building data systems &mdash; at Amazon I built event-driven pipelines processing 100K+ events per day, and more recently I've been designing AI-powered platforms including a legal document generation system with multi-LLM orchestration and RAG pipelines, and IoT monitoring systems at Fluvio. What excites me about this role at QBCC is the chance to apply scalable data science and AI &mdash; particularly predictive analytics and NLP &mdash; to strengthen Queensland's building and construction regulation, especially with the scale that the Olympics and housing targets will demand."
+    </div>
+
+    <div class="card" style="margin-top:1.5rem;">
+      <h3>Structure Breakdown</h3>
+      <table class="styled-table">
+        <tr><th>Beat</th><th>Content</th><th>Duration</th></tr>
+        <tr><td style="color:var(--accent);font-weight:600">Academic</td><td>PhD from UQ, federated learning, A* publications</td><td>~20s</td></tr>
+        <tr><td style="color:var(--accent2);font-weight:600">Amazon</td><td>Production pipelines, 100K+ events/day</td><td>~15s</td></tr>
+        <tr><td style="color:var(--green);font-weight:600">Recent AI work</td><td>Lexertia (GenAI/RAG), Fluvio (IoT)</td><td>~25s</td></tr>
+        <tr><td style="color:var(--yellow);font-weight:600">Why QBCC</td><td>Regulatory impact, Olympics scale, predictive analytics + NLP</td><td>~20s</td></tr>
+      </table>
+    </div>
+
+    <div class="alert alert-info" style="margin-top:1rem;">
+      <span class="alert-icon">&#x1f4a1;</span>
+      <div>Tip: Make eye contact with the camera (not the screen) when delivering this on Teams. Smile when you say "What excites me about this role."</div>
+    </div>
+  </div>
+
+  <!-- ==================== ABOUT QBCC ==================== -->
+  <div class="section" id="sec-qbcc">
+    <h2 class="section-title">About QBCC</h2>
+    <p class="section-subtitle">Queensland Building and Construction Commission &mdash; know who you're working for.</p>
+
+    <div class="card">
+      <h3>Mission &amp; Values</h3>
+      <p><strong>Purpose:</strong> "A thriving building and construction industry."</p>
+      <p><strong>Vision:</strong> "Working together to strengthen the building and construction industry through fair and transparent regulatory decision, services and actions."</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;">
+        <span class="tag tag-blue">Fairness</span>
+        <span class="tag tag-purple">Accountability</span>
+        <span class="tag tag-green">Integrity</span>
+        <span class="tag tag-yellow">Respect</span>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f4cb; 1. Licensing</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <ul>
+          <li>Issues, maintains, suspends, and cancels licences for builders, contractors, tradespeople, plumbers, certifiers</li>
+          <li>Active <strong>digital licensing reform</strong> underway (myQBCC portal)</li>
+          <li><strong>100,000+ active licensees</strong> across Queensland</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f4b0; 2. Financial Oversight</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <ul>
+          <li>Enforces <strong>Minimum Financial Requirements (MFR)</strong> for contractor licensees</li>
+          <li>Monitors: net tangible assets, current ratios, maximum revenue thresholds</li>
+          <li>Annual financial reporting and trust account auditing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f50d; 3. Compliance &amp; Enforcement</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <ul>
+          <li><strong>Intelligence-led, risk-based regulation</strong> (this is where data science fits!)</li>
+          <li>Compliance and Enforcement Strategy 2024-2026 identifies <strong>15 priority areas</strong></li>
+          <li>Shift from broad inspection campaigns to <strong>targeted, data-informed enforcement</strong></li>
+        </ul>
+        <div class="alert alert-info" style="margin-top:.5rem">
+          <span class="alert-icon">&#x2b50;</span>
+          <div>This is the #1 reason your role exists. Mention "intelligence-led regulation" in the interview.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f6e1; 4. Consumer Protection &amp; Disputes</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <ul>
+          <li>Payment dispute adjudication</li>
+          <li>Complaint investigation against contractors/certifiers</li>
+          <li>Home warranty insurance</li>
+          <li>Pool safety registration &amp; owner-builder permits</li>
+          <li>Non-conforming building products management</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;">
+      <h3>&#x1f4c8; Strategic Context &mdash; Why This Role Matters NOW</h3>
+      <div class="quote" style="margin-top:.5rem;">
+        "This is a defining decade for the building and construction sector, with ambitious housing targets and the Olympic and Paralympic legacy ahead."
+      </div>
+      <ul style="margin-top:.8rem;">
+        <li><strong>Queensland housing targets</strong> &mdash; massive increase in construction oversight</li>
+        <li><strong>Brisbane 2032 Olympics</strong> &mdash; huge construction pipeline</li>
+        <li><strong>Modernisation agenda</strong> &mdash; digital transformation of regulatory services</li>
+        <li><strong>Strategic Plan 2025-2029</strong> &mdash; current guiding document</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f3e2; Where You Sit</h3>
+      <div class="org-chart">
+        <div class="org-node">QBCC Commissioner</div>
+        <div class="org-line"></div>
+        <div class="org-node">Transformation and Change (Division)</div>
+        <div class="org-line"></div>
+        <div class="org-node">Business Intelligence &amp; Analytics (Branch)</div>
+        <div class="org-line"></div>
+        <div class="org-node">Data Science and Engineering (Unit)</div>
+        <div class="org-line"></div>
+        <div class="org-node you">Senior Data Scientist (YOU) &larr; reports to Zohaib Jan</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>&#x1f4f0; Recent News (March 2026)</h3>
+      <ul>
+        <li><strong>Combating fraud</strong> &mdash; contractor fraud on the Gold Coast</li>
+        <li><strong>Office relocation</strong> &mdash; moving to 488 Lutwyche Road from 23 March</li>
+        <li><strong>Painting defects</strong> &mdash; #1 reported building defect (1,875 cases)</li>
+        <li><strong>Lead-free plumbing</strong> &mdash; NCC changes effective 1 May 2026</li>
+        <li><strong>Rising construction costs</strong> &mdash; cost increase analysis across QLD</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>&#x2696; Legislation to Know</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.3rem;">
+        <span class="tag tag-blue">QBCC Act 1991</span>
+        <span class="tag tag-purple">WHS Act 2011</span>
+        <span class="tag tag-green">Public Sector Ethics Act 1994</span>
+        <span class="tag tag-yellow">Public Sector Act 2022</span>
+        <span class="tag tag-orange">RTI Act 2009</span>
+        <span class="tag tag-red">Information Privacy Act 2009</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== USE CASES ==================== -->
+  <div class="section" id="sec-usecases">
+    <h2 class="section-title">AI/ML Use Cases at QBCC</h2>
+    <p class="section-subtitle">These are the problems you'd likely work on. Reference them in answers.</p>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">1</span> Risk-Based Compliance Targeting</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Predictive models to identify licensees most likely to be non-compliant. Replace broad inspection campaigns with targeted, data-informed enforcement.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;">
+          <span class="tag tag-blue">XGBoost</span><span class="tag tag-purple">Feature Engineering</span><span class="tag tag-green">Risk Scoring</span>
+        </div>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">2</span> Contractor Financial Distress Prediction</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Using MFR reporting data to predict contractor insolvency before it impacts consumers. Early warning system for at-risk contractors.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;">
+          <span class="tag tag-blue">Time-Series</span><span class="tag tag-yellow">Financial Data</span><span class="tag tag-red">Anomaly Detection</span>
+        </div>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">3</span> NLP on Complaints and Disputes</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Classifying, routing, and prioritising the large volume of complaints. Extract patterns, identify systemic issues, auto-categorise.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;">
+          <span class="tag tag-blue">NLP</span><span class="tag tag-purple">Text Classification</span><span class="tag tag-green">LLMs</span>
+        </div>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">4</span> Fraud Detection</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Identifying fraudulent contractors, unlicensed operators, and post-disaster opportunists (e.g., recent Gold Coast fraud cases, March 2026).</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem;">
+          <span class="tag tag-red">Fraud Detection</span><span class="tag tag-yellow">Pattern Matching</span><span class="tag tag-purple">Graph Analysis</span>
+        </div>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">5</span> Building Defect Pattern Analysis</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Predictive analytics on defect types, geographic trends, contractor-specific patterns. Painting defects = #1 reported issue (1,875 cases).</p>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">6</span> Industry Forecasting</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Predicting construction activity, licensing demand, workforce needs &mdash; critical with the Olympic construction pipeline ramping up.</p>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">7</span> Licence Application Processing</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>AI-assisted review, validation, and risk scoring of licence applications.</p>
+      </div>
+    </div>
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3><span class="attr-num">8</span> Trust Account Anomaly Detection</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Financial compliance monitoring across the industry using transaction pattern analysis.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== STAR STORIES ==================== -->
+  <!-- STAR 1 -->
+  <div class="section" id="sec-star1">
+    <h2 class="section-title">Attribute 1: Scalable Data Solutions</h2>
+    <p class="section-subtitle">Python &amp; SQL &mdash; Amazon Out-of-Stock Prediction System</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>At Amazon Groceries, customers frequently encountered out-of-stock items, leading to missed purchases and poor experience. No proactive notification system existed.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Design and build a real-time event processing system to predict out-of-stock scenarios and notify customers proactively.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li>Built event-driven pipeline using AWS Lambda and DynamoDB processing <strong>100K+ events/day</strong></li>
+          <li>Wrote Python-based Lambda functions for event ingestion, transformation, and prediction logic</li>
+          <li>Designed DynamoDB schemas with efficient partition keys for high-throughput reads/writes</li>
+          <li>Implemented SQL-based analytics queries for reporting on prediction accuracy</li>
+          <li>Integrated with Amazon's internal notification systems for customer alerts</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Reduced missed purchases by <strong>25%</strong>. Won <strong>1st place at Amazon Hackathon</strong> (Dec 2022).</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"This experience directly translates to building event-driven data pipelines at QBCC &mdash; for example, processing licensee financial reporting submissions in real-time and triggering alerts when financial distress indicators are detected."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 2 -->
+  <div class="section" id="sec-star2">
+    <h2 class="section-title">Attribute 2: Cloud Data Platforms</h2>
+    <p class="section-subtitle">Data Warehousing &mdash; Fluvio IoT Data Platform</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Fluvio needed a centralized platform to manage 50+ water monitoring sensor sites, each generating continuous streams of environmental data.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Design the data architecture to ingest, store, and serve sensor data efficiently for real-time dashboards and historical analysis.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li>Designed <strong>DynamoDB schemas</strong> achieving <strong>&lt;100ms response times</strong> across <strong>1M+ data points</strong></li>
+          <li>Built Go microservices on AWS EC2 for data ingestion, validation, and serving</li>
+          <li>Implemented data partitioning strategies by site and time range</li>
+          <li>Created Grafana dashboards with role-based views</li>
+          <li>Set up automated data quality checks and alarm workflows</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Unified platform managing 50+ sites with sub-100ms query performance.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"QBCC manages data across 100K+ licensees, compliance records, financial reports, and complaint histories. My experience designing scalable cloud data architectures directly applies to building QBCC's analytics data platform, whether on Snowflake or another cloud warehouse."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 3 -->
+  <div class="section" id="sec-star3">
+    <h2 class="section-title">Attribute 3: ML Lifecycle Management</h2>
+    <p class="section-subtitle">PhD &mdash; Federated Recommender System (ReFRS)</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Traditional recommender systems require centralising user data, creating privacy risks. PhD aimed to build models that train across distributed devices without centralising sensitive data.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Design and implement a full ML lifecycle: data preparation &rarr; model training &rarr; deployment to edge devices &rarr; monitoring.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li><strong>Data Prep:</strong> Processed Yelp, MovieLens, Last.FM (20GB&ndash;100GB each)</li>
+          <li><strong>Model Dev:</strong> Built privacy-preserving models in PyTorch with federated architecture</li>
+          <li><strong>Training:</strong> Distributed training across simulated mobile clients with gradient compression</li>
+          <li><strong>Deployment:</strong> Resource-efficient models running on mobile devices</li>
+          <li><strong>Monitoring:</strong> Evaluation pipelines tracking quality, convergence, and privacy guarantees</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Published in <strong>ACM TOIS (CORE A*)</strong> &mdash; <strong>133 citations</strong>. Comparable accuracy to centralized systems while preserving privacy.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"This covers the entire ML lifecycle the PD describes. At QBCC, I'd build a compliance risk model trained on historical enforcement data, deployed for inspectors, and continuously monitored for model drift."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 4 -->
+  <div class="section" id="sec-star4">
+    <h2 class="section-title">Attribute 4: GenAI &amp; Agentic Systems</h2>
+    <p class="section-subtitle">Lexertia &mdash; AI-Powered Legal Document Generation</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Attorneys spend 60-80% of time on repetitive document drafting. Ibtidah Solutions was engaged to build an AI platform for automated court filings.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Architect a production-grade agentic AI system for legally sound court documents through conversational intake.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li><strong>6-phase state machine:</strong> intake &rarr; structuring &rarr; RAG drafting &rarr; review &rarr; editing &rarr; export</li>
+          <li><strong>Multi-LLM orchestration:</strong> OpenAI, Claude, Gemini, Grok &mdash; dynamically selected</li>
+          <li><strong>Agentic RAG:</strong> AnythingLLM + vector search + Bluebook citation dedup + cross-section coherence</li>
+          <li><strong>18 filing templates</strong>, <strong>16 system prompts</strong>, 3 court-specific format profiles</li>
+          <li>Streaming WebSocket output with per-section cost/token tracking</li>
+          <li>Production deployment: AWS EC2 + Nginx + systemd + CI/CD</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Production SaaS platform serving attorneys. Drafting time reduced from hours to minutes.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"I've built production agentic systems from POC to deployment. At QBCC, similar architectures could power automated complaint classification, intelligent licence review, or a conversational assistant for compliance officers."</div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--accent2);">
+      <h3>Supporting: Medical Transcription Automation</h3>
+      <ul>
+        <li>Agentic RAG workflow via LangChain + FAISS &mdash; <strong>95%+ accuracy</strong></li>
+        <li>Real-time audio &rarr; clinical note generation, saving <strong>15+ hours/week</strong></li>
+        <li>Pattern: domain-specific RAG + LLM agents in regulated, sensitive data environment</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- STAR 5 -->
+  <div class="section" id="sec-star5">
+    <h2 class="section-title">Attribute 5: Business &rarr; Technical Solutions</h2>
+    <p class="section-subtitle">Amazon Fresh &mdash; From Business Problem to Production</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Amazon Fresh wanted to increase engagement with promoted grocery products, but the existing UI didn't highlight priority items effectively.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Translate "make promoted products more visible and drive engagement" into a deployable technical solution.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li>Worked with product managers to understand goals and success metrics</li>
+          <li>Translated requirements into technical design for high-priority item interfaces</li>
+          <li>Built UI components integrated with Amazon's recommendation backend</li>
+          <li>Validated with A/B tests against business KPIs</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Increased customer engagement with promoted products by <strong>18%</strong>.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"At QBCC, I'd sit with the compliance team to understand what regulatory outcome they need, then translate that into a data science solution. If Adela's team says 'we need to catch unlicensed operators faster,' I'd translate that into a fraud detection model with specific features and data sources."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 6 -->
+  <div class="section" id="sec-star6">
+    <h2 class="section-title">Attribute 6: MLOps &amp; CI/CD</h2>
+    <p class="section-subtitle">Lexertia Production Deployment</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Lexertia needed reliable production SaaS deployment with automated updates and monitoring.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Set up production infrastructure and CI/CD pipeline for a multi-service AI application.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li><strong>AWS EC2</strong> + <strong>Nginx reverse proxy</strong> for load balancing &amp; SSL</li>
+          <li><strong>systemd</strong> orchestration for FastAPI, Celery, Redis, AnythingLLM</li>
+          <li>Automated <strong>rsync-based CI/CD pipeline</strong></li>
+          <li>Per-section <strong>cost/token tracking</strong> + generation log dashboards</li>
+          <li>WebSocket health checks and service restart policies</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Reliable production deployment with automated CI/CD and monitoring. Consistent uptime.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"For QBCC, I'd set up proper MLOps: model versioning, automated retraining pipelines, A/B testing for model updates, monitoring dashboards for drift, and CI/CD for data science code."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 7 -->
+  <div class="section" id="sec-star7">
+    <h2 class="section-title">Attribute 7: Responsible AI &amp; Data Ethics</h2>
+    <p class="section-subtitle">PhD &mdash; Privacy-Preserving Federated Learning</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>PhD research directly addressed responsible AI: building effective ML without compromising user privacy.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Develop recommendation systems that deliver high-quality results while keeping user data on-device.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li>Designed <strong>federated architecture</strong> &mdash; models train locally, share only encrypted gradients</li>
+          <li>Implemented privacy mechanisms to prevent model inversion attacks</li>
+          <li>Built resource-efficient models respecting device constraints</li>
+          <li>Evaluated privacy guarantees mathematically and empirically</li>
+          <li>Published at <strong>CORE A* venues</strong> (ICDE, TKDE)</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>Comparable quality to centralized systems with privacy guarantees. <strong>133+ citations</strong>.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"In government, responsible AI is non-negotiable. QBCC handles sensitive licensee data, financial info, complaints. I'd ensure proper bias testing, explainability (SHAP values), audit trails, and compliance with the Information Privacy Act 2009."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAR 8 -->
+  <div class="section" id="sec-star8">
+    <h2 class="section-title">Attribute 8: Stakeholder Engagement</h2>
+    <p class="section-subtitle">Cross-Domain Consulting &mdash; Legal, Healthcare, IoT, Academia</p>
+    <div class="card">
+      <div class="star-block"><span class="star-label star-s">Situation</span><p>Across consulting at Ibtidah Solutions and Fluvio, I've explained complex AI to non-technical stakeholders in very different domains.</p></div>
+      <div class="star-block"><span class="star-label star-t">Task</span><p>Make technical decisions understandable and build trust with domain experts.</p></div>
+      <div class="star-block"><span class="star-label star-a">Action</span>
+        <ul>
+          <li><strong>Legal (Lexertia):</strong> Explained RAG and LLM limitations to attorneys; when human review is essential</li>
+          <li><strong>Healthcare:</strong> Communicated accuracy metrics to clinicians; designed review interface for verification</li>
+          <li><strong>IoT (Fluvio):</strong> Worked with engineers &amp; operators on dashboards &mdash; operators need alerts, managers need trends</li>
+          <li><strong>Academia:</strong> Presented at UQ ITEE seminars, ICDE, DASFAA to mixed audiences</li>
+        </ul>
+      </div>
+      <div class="star-block"><span class="star-label star-r">Result</span><p>AI products adopted by attorneys, clinicians, and field operators &mdash; each with different technical literacy.</p></div>
+      <div class="star-block"><span class="star-label star-q">QBCC Angle</span>
+        <div class="quote">"At QBCC, I'd present model results as regulatory insights, not just accuracy metrics. For a compliance officer: 'here are the 50 contractors most likely to have issues, ranked by risk, and here's why each flagged' &mdash; not 'the XGBoost model achieved 0.87 AUC.'"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TECHNICAL ==================== -->
+  <div class="section" id="sec-technical">
+    <h2 class="section-title">Technical Assessment Prep</h2>
+    <p class="section-subtitle">~15-20 min component. Likely: live coding, system design, or ML pipeline walkthrough.</p>
+
+    <div class="collapsible open">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f40d; Python: Licensee Financial Data Processing</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+<div class="code-block"><span class="lang-tag">Python</span><span class="cm"># Scenario: Detect contractors at risk of insolvency</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingClassifier
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+
+df = pd.<span class="fn">read_csv</span>(<span class="str">'contractor_mfr.csv'</span>)
+
+<span class="cm"># Feature engineering</span>
+df[<span class="str">'current_ratio'</span>] = df[<span class="str">'current_assets'</span>] / df[<span class="str">'current_liabilities'</span>]
+df[<span class="str">'nta_ratio'</span>] = df[<span class="str">'net_tangible_assets'</span>] / df[<span class="str">'max_revenue'</span>]
+df[<span class="str">'revenue_utilization'</span>] = df[<span class="str">'actual_revenue'</span>] / df[<span class="str">'max_revenue'</span>]
+df[<span class="str">'yoy_nta_change'</span>] = df.<span class="fn">groupby</span>(<span class="str">'licence_id'</span>)[<span class="str">'net_tangible_assets'</span>].<span class="fn">pct_change</span>()
+
+features = [<span class="str">'current_ratio'</span>, <span class="str">'nta_ratio'</span>, <span class="str">'revenue_utilization'</span>,
+            <span class="str">'yoy_nta_change'</span>, <span class="str">'years_licensed'</span>, <span class="str">'complaint_count'</span>,
+            <span class="str">'defect_count'</span>, <span class="str">'trade_category'</span>]
+
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(
+    df[features], df[<span class="str">'became_insolvent_12m'</span>], test_size=<span class="num">0.2</span>, stratify=y)
+
+model = <span class="fn">GradientBoostingClassifier</span>(n_estimators=<span class="num">200</span>, max_depth=<span class="num">5</span>)
+model.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># Regulatory context: recall &gt; precision</span>
+<span class="cm"># Better to flag a false positive than miss insolvency</span>
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, model.<span class="fn">predict</span>(X_test)))</div>
+        <div class="alert alert-info">
+          <span class="alert-icon">&#x1f4a1;</span>
+          <div><strong>Key concepts:</strong> pandas groupby, merge, window functions; data cleaning; feature engineering; sklearn pipelines; datetime data</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f4be; SQL: Compliance Risk Query</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+<div class="code-block"><span class="lang-tag">SQL</span><span class="cm">-- Find contractors with the highest risk profile</span>
+<span class="kw">WITH</span> complaint_summary <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> licence_id,
+        <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_complaints,
+        <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> complaint_date >= <span class="fn">DATEADD</span>(month, <span class="num">-12</span>, <span class="fn">CURRENT_DATE</span>)
+              <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">END</span>) <span class="kw">AS</span> complaints_last_12m,
+        <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> severity = <span class="str">'HIGH'</span> <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">END</span>) <span class="kw">AS</span> high_severity_count
+    <span class="kw">FROM</span> complaints <span class="kw">GROUP BY</span> licence_id
+),
+financial_health <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> licence_id, net_tangible_assets, current_ratio,
+        <span class="fn">LAG</span>(net_tangible_assets) <span class="kw">OVER</span> (
+            <span class="kw">PARTITION BY</span> licence_id <span class="kw">ORDER BY</span> reporting_period
+        ) <span class="kw">AS</span> prev_nta,
+        <span class="kw">CASE WHEN</span> net_tangible_assets &lt; required_minimum_nta
+             <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END AS</span> below_mfr
+    <span class="kw">FROM</span> financial_reports
+    <span class="kw">WHERE</span> reporting_period = (<span class="kw">SELECT MAX</span>(reporting_period) <span class="kw">FROM</span> financial_reports)
+)
+<span class="kw">SELECT</span> l.licence_id, l.business_name, l.trade_category,
+    c.complaints_last_12m, f.current_ratio, f.below_mfr,
+    (<span class="fn">COALESCE</span>(c.complaints_last_12m,<span class="num">0</span>)*<span class="num">2</span> + <span class="fn">COALESCE</span>(f.below_mfr,<span class="num">0</span>)*<span class="num">5</span>) <span class="kw">AS</span> risk_score
+<span class="kw">FROM</span> licensees l
+<span class="kw">LEFT JOIN</span> complaint_summary c <span class="kw">ON</span> l.licence_id = c.licence_id
+<span class="kw">LEFT JOIN</span> financial_health f <span class="kw">ON</span> l.licence_id = f.licence_id
+<span class="kw">ORDER BY</span> risk_score <span class="kw">DESC LIMIT</span> <span class="num">50</span>;</div>
+        <div class="alert alert-info">
+          <span class="alert-icon">&#x1f4a1;</span>
+          <div><strong>Key SQL:</strong> CTEs, window functions (LAG/LEAD/ROW_NUMBER), conditional aggregation, JOINs, date arithmetic, Snowflake syntax (QUALIFY)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f3d7; System Design: Compliance Risk Model</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+<div class="diagram">[Data Sources]                  [Data Pipeline]              [ML Pipeline]
+&#9500;&#9472; Licensee DB          &#9472;&#9472;&rarr;    &#9500;&#9472; ETL (Python/SQL)    &#9472;&#9472;&rarr;  &#9500;&#9472; Feature Store
+&#9500;&#9472; Complaint System     &#9472;&#9472;&rarr;    &#9500;&#9472; Data Quality Checks &#9472;&#9472;&rarr;  &#9500;&#9472; Model Training
+&#9500;&#9472; Financial Reports    &#9472;&#9472;&rarr;    &#9500;&#9472; Snowflake DWH       &#9472;&#9472;&rarr;  &#9500;&#9472; Model Registry
+&#9500;&#9472; Inspection Records   &#9472;&#9472;&rarr;    &#9492;&#9472; Scheduling (Airflow) &#9472;&rarr;  &#9500;&#9472; Model Serving API
+&#9492;&#9472; External Data        &#9472;&#9472;&rarr;                                   &#9492;&#9472; Monitoring Dashboard
+     (weather, economic)                                            &#9474;
+                                                             [Consumption Layer]
+                                                             &#9500;&#9472; Compliance Dashboard
+                                                             &#9500;&#9472; Risk Alerts
+                                                             &#9500;&#9472; Inspector Mobile App
+                                                             &#9492;&#9472; Quarterly Reports</div>
+        <h3 style="margin-top:1rem;font-size:.9rem;">Key Points to Hit:</h3>
+        <ol style="padding-left:1.2rem;font-size:.88rem;color:var(--text2);">
+          <li><strong>Data Layer:</strong> Snowflake DWH, structured + semi-structured (complaint text)</li>
+          <li><strong>Features:</strong> Historical complaints, financial trajectory, trade risk, geography, seasonal</li>
+          <li><strong>Model:</strong> Gradient boosting (XGBoost/LightGBM) &mdash; interpretable for regulatory decisions</li>
+          <li><strong>Why not deep learning?</strong> Tree-based models are more interpretable and often better for tabular data</li>
+          <li><strong>Monitoring:</strong> Model drift, feature drift, prediction distribution</li>
+          <li><strong>Governance:</strong> Model cards, bias testing, audit trail for every prediction</li>
+          <li><strong>Responsible AI:</strong> No discrimination by geography, business size, or protected attributes</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>&#x1f916; GenAI Design: Complaint Processing Agent</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+<div class="diagram">[Complaint Intake]
+     &#9474;
+     &#9660;
+[NLP Classification Agent]
+&#9500;&#9472; Extract: complaint type, severity, parties, location
+&#9500;&#9472; Classify: defect / financial dispute / unlicensed work / safety
+&#9500;&#9472; Route: to correct team (Services Trades, Compliance, Licensing)
+     &#9474;
+     &#9660;
+[RAG Knowledge Agent]
+&#9500;&#9472; Search: similar past complaints and resolutions
+&#9500;&#9472; Retrieve: regulatory guidelines and precedents
+&#9500;&#9472; Generate: recommended action summary for case officer
+     &#9474;
+     &#9660;
+[Risk Scoring Agent]
+&#9500;&#9472; Cross-reference: contractor history, financial status, inspections
+&#9500;&#9472; Score: urgency and risk level
+&#9500;&#9472; Alert: if pattern suggests systemic issue
+     &#9474;
+     &#9660;
+[Human Review Interface]
+&#9500;&#9472; Case officer reviews AI recommendations
+&#9500;&#9472; Approve / modify / override with feedback
+&#9492;&#9472; Feedback loop to improve models</div>
+        <p style="margin-top:.8rem;font-size:.88rem;color:var(--text2);"><strong>Stack:</strong> Claude/GPT-4 for classification &bull; sentence-transformers for embeddings &bull; FAISS/pgvector &bull; LangChain orchestration &bull; FastAPI + Celery &bull; Human-in-the-loop governance</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== QUICK FIRE ==================== -->
+  <div class="section" id="sec-quickfire">
+    <h2 class="section-title">Quick-Fire Q&amp;A</h2>
+    <p class="section-subtitle">Click each question to reveal the answer.</p>
+
+    <h3 style="color:var(--accent);font-size:.85rem;margin:1rem 0 .5rem;">Python / Data</h3>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">How would you handle a dataset with 80% missing values in a key column?</div>
+      <div class="flashcard-a">First investigate <em>why</em> it's missing (MCAR/MAR/MNAR). Options: drop the column if not predictive; impute with median/mode for simple cases; use model-based imputation (KNN, iterative); create a binary "is_missing" indicator feature; or use models that handle missing values natively (XGBoost, LightGBM).</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">Explain data lake vs data warehouse</div>
+      <div class="flashcard-a"><strong>Data Lake:</strong> Raw, unstructured/semi-structured data, schema-on-read, cheap storage (S3), good for exploration. <strong>Data Warehouse:</strong> Structured, curated, schema-on-write (Snowflake), optimized for analytics queries, governed. Modern approach: lakehouse combines both.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">How do you handle class imbalance in fraud detection?</div>
+      <div class="flashcard-a">SMOTE/ADASYN for oversampling; class weights in the model; threshold tuning (lower threshold = higher recall); ensemble methods; anomaly detection approach (treat fraud as outliers). In regulatory context, <strong>optimize for recall</strong> &mdash; better to flag false positives than miss fraud.</div>
+    </div>
+
+    <h3 style="color:var(--accent2);font-size:.85rem;margin:1rem 0 .5rem;">Machine Learning</h3>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">What's the difference between L1 and L2 regularization?</div>
+      <div class="flashcard-a"><strong>L1 (Lasso):</strong> Adds absolute value of coefficients; produces sparse models (feature selection). <strong>L2 (Ridge):</strong> Adds squared coefficients; shrinks all weights but doesn't zero them. Use L1 when you suspect many irrelevant features; L2 when most features are useful.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">How do you detect model drift in production?</div>
+      <div class="flashcard-a">Monitor: (1) <strong>Data drift</strong> &mdash; statistical tests (KS test, PSI) on input features; (2) <strong>Concept drift</strong> &mdash; track prediction distribution shifts; (3) <strong>Performance drift</strong> &mdash; monitor accuracy/recall on labeled feedback. Set up alerts when metrics cross thresholds. Schedule periodic retraining.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">Explain precision vs recall in a regulatory context</div>
+      <div class="flashcard-a"><strong>Precision:</strong> Of contractors we flagged, how many were actually non-compliant? <strong>Recall:</strong> Of all non-compliant contractors, how many did we catch? <strong>In regulation, recall matters more</strong> &mdash; missing a non-compliant contractor (false negative) can harm consumers, while investigating a compliant one (false positive) just costs inspection time.</div>
+    </div>
+
+    <h3 style="color:var(--green);font-size:.85rem;margin:1rem 0 .5rem;">GenAI</h3>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">Key risks of LLMs in government regulatory context?</div>
+      <div class="flashcard-a"><strong>Hallucination</strong> &mdash; generating plausible but false regulatory guidance. <strong>Data privacy</strong> &mdash; sensitive data in prompts. <strong>Bias</strong> &mdash; unfair treatment of certain groups. <strong>Accountability</strong> &mdash; who is responsible for AI-driven regulatory decisions? <strong>Mitigation:</strong> RAG for grounding, human-in-the-loop, audit logging, data anonymisation.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">Fine-tuning vs RAG &mdash; when to use each?</div>
+      <div class="flashcard-a"><strong>RAG:</strong> When you need up-to-date knowledge, citations, or domain-specific docs &mdash; no model retraining needed. <strong>Fine-tuning:</strong> When you need the model to learn a specific style, format, or task (e.g., always output structured JSON). <strong>For QBCC:</strong> RAG for regulatory document Q&amp;A; fine-tuning if you need a specialized complaint classifier.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">How do you evaluate RAG system quality?</div>
+      <div class="flashcard-a">Three dimensions: (1) <strong>Retrieval relevance</strong> &mdash; are the right docs being retrieved? (2) <strong>Faithfulness</strong> &mdash; does the answer match retrieved context (no hallucination)? (3) <strong>Answer correctness</strong> &mdash; is the final answer accurate? Tools: RAGAS framework, human evaluation, A/B testing.</div>
+    </div>
+
+    <h3 style="color:var(--yellow);font-size:.85rem;margin:1rem 0 .5rem;">Responsible AI</h3>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">How would you ensure a compliance model isn't biased?</div>
+      <div class="flashcard-a">Test model predictions across demographic slices (geography, trade type, business size). Use fairness metrics (equal opportunity, demographic parity). Apply SHAP for feature explainability &mdash; ensure no proxy discrimination. Regular bias audits. Document in model cards. Seek diverse stakeholder review.</div>
+    </div>
+    <div class="flashcard" onclick="this.classList.toggle('open')">
+      <div class="flashcard-q">What governance frameworks for AI regulatory recommendations?</div>
+      <div class="flashcard-a">Model cards (documenting purpose, limitations, performance); human-in-the-loop for high-stakes decisions; audit trail for every prediction; explainability requirements (SHAP); regular review cycles; compliance with Information Privacy Act 2009 and Public Sector Ethics Act 1994; risk-tiered approach (higher stakes = more oversight).</div>
+    </div>
+  </div>
+
+  <!-- ==================== BONUS ==================== -->
+  <div class="section" id="sec-bonus">
+    <h2 class="section-title">Bonus Questions</h2>
+    <p class="section-subtitle">Common behavioural questions with prepared answers.</p>
+
+    <div class="collapsible open">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>"Tell me about a time you failed or faced a significant challenge"</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <p>Early in my PhD, my first approach to decentralized embeddings didn't scale beyond small datasets. The communication overhead between nodes made it impractical for real-world networks.</p>
+        <p style="margin-top:.5rem;"><strong>What I did:</strong> Went back to fundamentals, redesigned the partitioning strategy, and developed a novel heterogeneous network embedding approach that reduced communication by 10x.</p>
+        <p style="margin-top:.5rem;"><strong>Result:</strong> This became my <strong>Best Paper Award at DASFAA 2020</strong> and later my ICDE 2021 publication.</p>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>"Why QBCC? Why this role?"</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="quote">"Three reasons. First, the scale and impact &mdash; QBCC regulates an industry that directly affects every Queenslander who builds or buys a home, and with the Olympics ahead, the data challenges are only growing. Second, the role sits at the intersection of my strengths &mdash; scalable data engineering, ML production systems, and responsible AI &mdash; all applied to a domain where getting it right actually protects consumers and supports fair regulation. Third, I'm drawn to the team structure &mdash; sitting in a dedicated Data Science and Engineering unit within the Transformation and Change division tells me QBCC is serious about this, not just adding AI as an afterthought."</div>
+      </div>
+    </div>
+
+    <div class="collapsible">
+      <div class="collapsible-header" onclick="toggleCollapse(this)">
+        <h3>"Why should we hire you?"</h3>
+        <span class="collapsible-arrow">&#x25BC;</span>
+      </div>
+      <div class="collapsible-body">
+        <div class="quote">"I bring a rare combination: a PhD in data science focused on privacy-preserving ML, production engineering experience at Amazon building high-throughput systems, and hands-on delivery of agentic AI systems from proof of concept to production. I can design the architecture, write the code, deploy the models, and explain the results to non-technical stakeholders. For QBCC specifically, my experience with responsible AI and governance in regulated domains &mdash; legal and healthcare &mdash; means I understand that in government, the AI doesn't just need to be accurate, it needs to be explainable, fair, and auditable."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== QUESTIONS ==================== -->
+  <div class="section" id="sec-questions">
+    <h2 class="section-title">Questions to Ask the Panel</h2>
+    <p class="section-subtitle">Pick 2-3. Asking good questions shows preparation and genuine interest.</p>
+
+    <div class="card">
+      <h3 style="color:var(--accent);">For Zohaib Jan (Your Future Manager)</h3>
+      <ol style="padding-left:1.2rem;">
+        <li style="margin-bottom:.8rem;">"What does the current data science tech stack look like &mdash; are you on Snowflake already, or is platform selection part of the role?"</li>
+        <li style="margin-bottom:.8rem;">"What's the most impactful AI/ML use case the team is currently working on or planning to tackle next?"</li>
+        <li style="margin-bottom:.8rem;">"How does the Data Science and Engineering team collaborate with the compliance and licensing business units?"</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--accent2);">For Adela Padurean (Services Trades)</h3>
+      <ol start="4" style="padding-left:1.2rem;">
+        <li style="margin-bottom:.8rem;">"From the Services Trades perspective, what data challenges would you most want the data science team to solve?"</li>
+        <li style="margin-bottom:.8rem;">"How do you currently use data to inform your regulatory decisions?"</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="color:var(--green);">General</h3>
+      <ol start="6" style="padding-left:1.2rem;">
+        <li>"What does success look like in the first 6 months for this role?"</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ==================== EMBELLISHED ==================== -->
+  <div class="section" id="sec-embellished">
+    <h2 class="section-title">Reality Check</h2>
+    <p class="section-subtitle">Know exactly what's real vs. embellished. Don't get caught off guard.</p>
+
+    <div class="alert alert-warn" style="margin-bottom:1.5rem;">
+      <span class="alert-icon">&#x26a0;</span>
+      <div>Review this section carefully. If asked about any embellished detail, use the "How to Handle" guidance below.</div>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--green);">
+      <h3 style="color:var(--green);">100% Real (from your CV)</h3>
+      <ul>
+        <li>Amazon: 100K+ events/day, Lambda, DynamoDB, 25% reduction, 18% engagement, Hackathon 1st</li>
+        <li>Fluvio: 50+ sites, &lt;100ms response, 1M+ data points, Go/React/DynamoDB/Grafana</li>
+        <li>Lexertia: 6-phase pipeline, multi-LLM, 18 templates, 16 prompts, RAG, FastAPI/MongoDB</li>
+        <li>Medical Transcription: agentic RAG, LangChain/FAISS, 95%+ accuracy, 15+ hrs/week saved</li>
+        <li>PhD: ReFRS (133 citations, TOIS A*), DeHIN (TKDE A*), DASFAA Best Paper, 100GB+ datasets</li>
+      </ul>
+    </div>
+
+    <h3 style="color:var(--yellow);font-size:.9rem;margin:1.5rem 0 .8rem;">Embellished / Extrapolated Details</h3>
+
+    <table class="styled-table">
+      <tr><th>Topic</th><th>What's Real</th><th>What's Added</th><th>How to Handle</th></tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">Amazon A/B testing</td>
+        <td>Built out-of-stock system + Fresh UI</td>
+        <td>PM collaboration, A/B testing framing</td>
+        <td class="risk-low">"Standard Amazon practice" &mdash; low risk</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">Snowflake experience</td>
+        <td>Microsoft Fabric, DynamoDB, AWS</td>
+        <td>Snowflake not used directly</td>
+        <td class="risk-med">"Similar cloud DWH concepts; haven't used Snowflake specifically"</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">MLOps maturity</td>
+        <td>rsync CI/CD, systemd, Nginx</td>
+        <td>Framed as full MLOps</td>
+        <td class="risk-med">"Done production deployment; want to build mature MLOps with MLflow at QBCC"</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">Differential privacy</td>
+        <td>Federated learning for privacy</td>
+        <td>Formal DP guarantee claims</td>
+        <td class="risk-med">"Federated architecture for privacy; aware of formal DP approaches"</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">Bias testing tools</td>
+        <td>Not explicitly on CV</td>
+        <td>SHAP, fairness metrics framed as intent</td>
+        <td class="risk-low">"Understand the practices; would implement at QBCC"</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text);font-weight:600">QBCC use cases</td>
+        <td>Research-based scenarios</td>
+        <td>Hypothetical system designs</td>
+        <td class="risk-high">Always say "I would build..." never "I have built..."</td>
+      </tr>
+    </table>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ===== LOGIN =====
+function handleLogin(e) {
+  e.preventDefault();
+  const pw = document.getElementById('loginPassword').value;
+  // SHA-256 hash of the password for basic obfuscation
+  // (not server-side secure, but prevents casual viewing)
+  if (pw === '2023') {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.body.classList.remove('locked');
+    sessionStorage.setItem('prep_unlocked', '1');
+  } else {
+    document.getElementById('loginError').classList.add('show');
+    document.getElementById('loginBox').classList.add('shake');
+    document.getElementById('loginPassword').value = '';
+    setTimeout(() => {
+      document.getElementById('loginBox').classList.remove('shake');
+    }, 500);
+  }
+  return false;
+}
+// Auto-unlock if already authenticated this session
+if (sessionStorage.getItem('prep_unlocked') === '1') {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.body.classList.remove('locked');
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown() {
+  const interview = new Date('2026-03-17T11:00:00+10:00');
+  const now = new Date();
+  const diff = interview - now;
+  if (diff <= 0) { document.getElementById('countdown').textContent = 'NOW!'; return; }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  let parts = [];
+  if (d > 0) parts.push(d + 'd');
+  parts.push(h + 'h');
+  parts.push(m + 'm');
+  document.getElementById('countdown').textContent = parts.join(' ');
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ===== NAVIGATION =====
+const visited = new Set();
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  const nav = document.querySelector(`[data-section="${id}"]`);
+  if (nav) nav.classList.add('active');
+  visited.add(id);
+  const chk = document.getElementById('check-' + id);
+  if (chk) chk.classList.add('done');
+  updateProgress();
+  // close sidebar on mobile
+  if (window.innerWidth <= 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+  window.scrollTo(0, 0);
+}
+
+// ===== PROGRESS =====
+function updateProgress() {
+  const total = document.querySelectorAll('.nav-item').length;
+  const pct = Math.round((visited.size / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+// ===== SIDEBAR TOGGLE =====
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show');
+}
+
+// ===== COLLAPSIBLE =====
+function toggleCollapse(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+// ===== SEARCH =====
+function handleSearch(query) {
+  if (!query.trim()) {
+    document.querySelectorAll('.nav-item').forEach(n => n.style.display = '');
+    document.querySelectorAll('.sidebar-section').forEach(s => s.style.display = '');
+    return;
+  }
+  const q = query.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const text = n.textContent.toLowerCase();
+    n.style.display = text.includes(q) ? '' : 'none';
+  });
+  // Also search within section content and highlight matching sections
+  document.querySelectorAll('.sidebar-section').forEach(s => {
+    const items = s.querySelectorAll('.nav-item');
+    const anyVisible = Array.from(items).some(i => i.style.display !== 'none');
+    s.style.display = anyVisible ? '' : 'none';
+  });
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && !e.ctrlKey && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('search').focus();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('search').blur();
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+});
+
+// Mark dashboard as visited on load
+visited.add('dashboard');
+updateProgress();
+</script>
+</body>
+</html>
